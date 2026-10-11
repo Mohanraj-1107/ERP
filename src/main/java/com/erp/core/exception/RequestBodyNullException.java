@@ -12,5 +12,4 @@ public class RequestBodyNullException extends Exception{
 	public RequestBodyNullException(String message,Throwable cause) {
 		super(message,cause);
 	}
-	
 }

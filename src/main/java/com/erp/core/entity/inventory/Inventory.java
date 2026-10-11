@@ -29,7 +29,6 @@ public class Inventory {
 	@JoinColumn(name = "productId", nullable = false)
 	private Product product;
 	
-	
 	@Column(nullable=false)
 	private double quantity;
 	

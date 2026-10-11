@@ -10,12 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 import java.time.Instant;
 import java.util.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.erp.core.entity.common.Address;
 import com.erp.core.entity.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;

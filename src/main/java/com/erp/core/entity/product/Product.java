@@ -4,7 +4,6 @@ package com.erp.core.entity.product;
 import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.erp.core.entity.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -17,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+@SuppressWarnings("unused")
 @Entity
 public class Product {
 	
@@ -32,7 +32,7 @@ public class Product {
 	@Column(nullable=false,unique=true)
 	private String productCode;
 	
-	@Column(nullable=false)
+	@Column(nullable=false,unique=true)
 	private String productName;
 	
 	@Column(nullable=false)
@@ -47,7 +47,7 @@ public class Product {
 	private double minimumStock;
 	
 	@Enumerated(EnumType.STRING)
-	private Unit unit;
+	private Unit unit=Unit.KG;
 	
 	@CreationTimestamp
 	@Column(updatable=false,nullable=false)
@@ -56,5 +56,4 @@ public class Product {
 	@UpdateTimestamp
 	@Column(nullable=false)
 	private Instant modifiedOn;
-
 }

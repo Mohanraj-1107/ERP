@@ -28,7 +28,7 @@ public class GetOrgResponse {
 	private String mobileNo;
 	
 	@JsonProperty("created_on")
-	private Instant CreatedOn;
+	private Instant createdOn;
 	
 	public GetOrgResponse(long orgId, String orgName, String orgEmail, List<Address> address, String mobileNo, Instant createdOn) {
 		super();
@@ -37,7 +37,7 @@ public class GetOrgResponse {
 		this.orgEmail = orgEmail;
 		this.address = address;
 		this.mobileNo = mobileNo;
-		CreatedOn = createdOn;
+		this.createdOn = createdOn;
 	}
 	
 	public  static class ResponseBuilder{
@@ -47,7 +47,7 @@ public class GetOrgResponse {
 		private String orgEmail;
 		private List<Address> address;
 		private String mobileNo;
-		private Instant CreatedOn;
+		private Instant createdOn;
 		
 		public ResponseBuilder setOrgId(long orgId) {
 			this.orgId = orgId;
@@ -70,11 +70,11 @@ public class GetOrgResponse {
 			return this;
 		}
 		public ResponseBuilder setCreatedOn(Instant createdOn) {
-			this.CreatedOn = createdOn;
+			this.createdOn = createdOn;
 			return this;
 		}
 		public GetOrgResponse build() {
-			return new GetOrgResponse(this.orgId,this.orgName,this.orgEmail,this.address,this.mobileNo,this.CreatedOn);
+			return new GetOrgResponse(this.orgId,this.orgName,this.orgEmail,this.address,this.mobileNo,this.createdOn);
 		}
 	}
 }

@@ -17,8 +17,9 @@ public class GlobalExceptionHandler {
 	 
 	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	
-	//400 Client Side Exceptions
-	
+	/*
+	 * 400 Client Side Exceptions
+	 */
 	@ExceptionHandler(InvalidPathVariableException.class)
 	public static ResponseEntity<ErrorResponse> handlerInvalidPathVariableException(InvalidPathVariableException e,HttpServletRequest request){
 	      ErrorResponse response=new ErrorResponse(e.getMessage(),HttpStatus.BAD_REQUEST.value(),request.getRequestURI(),Instant.now());
@@ -40,5 +41,10 @@ public class GlobalExceptionHandler {
 	      return ResponseEntity.badRequest().body(response);
 	}
 	
-	
+	@ExceptionHandler(DuplicateEntityException.class)
+	public static ResponseEntity<ErrorResponse> handleDuplicateEntityException(DuplicateEntityException e,HttpServletRequest request){
+	      ErrorResponse response=new ErrorResponse(e.getMessage(),HttpStatus.BAD_REQUEST.value(),request.getRequestURI(),Instant.now());
+	      logger.warn("Invalid request body: {}", e.getMessage());
+	      return ResponseEntity.badRequest().body(response);
+	} 
 }

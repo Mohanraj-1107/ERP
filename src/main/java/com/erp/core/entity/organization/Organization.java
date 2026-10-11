@@ -25,7 +25,7 @@ public class Organization {
 	@Column(nullable = false)
 	private String orgName;
 	
-	@Column(nullable = false)
+	@Column(nullable = false,unique=true)
 	private String orgEmail;
 	
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

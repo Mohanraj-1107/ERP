@@ -2,11 +2,13 @@
 package com.erp.core.service;
 
 import java.time.Instant;
+import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.erp.core.entity.organization.CreateOrgRequest;
 import com.erp.core.entity.organization.GetOrgResponse;
 import com.erp.core.entity.organization.Organization;
+import com.erp.core.exception.DuplicateEntityException;
 import com.erp.core.exception.InvalidPathVariableException;
 import com.erp.core.exception.RequestBodyNullException;
 import com.erp.core.repository.OrganizationRepo;
@@ -39,9 +41,13 @@ public class OrgService {
 	   return response;
 	}
 	
-	public void createOrg(CreateOrgRequest orgRequest) throws Exception{
+	public Organization createOrg(CreateOrgRequest orgRequest) throws Exception{
 		if(orgRequest==null) {
-			throw new RequestBodyNullException("Request body is null for create org request");
+			throw new RequestBodyNullException("Request body is null for org creation request");
+		}
+		Optional<Organization> available=orgRepo.findByOrgEmail(orgRequest.getOrgEmail());
+		if(available.isPresent()){
+			throw new DuplicateEntityException("OrgEmail is already registered , Please enter different email");
 		}
 		Organization org=new Organization();
 		org.setAddress(orgRequest.getAddress());
@@ -51,5 +57,6 @@ public class OrgService {
 		org.setOrgName(orgRequest.getOrgName());
 		org.setOrgPassword(passwordEncoder.encode(orgRequest.getOrgPassword()));
 		orgRepo.save(org);
+		return org;
 	}
 }
