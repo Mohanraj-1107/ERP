@@ -30,10 +30,10 @@ public class JwtUtils {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 	
-	public String generateToken(String orgName) {
+	public String generateAccessToken(String orgId) {
 		
 		return Jwts.builder()
-				.setSubject(orgName)
+				.setSubject(orgId)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(key,SignatureAlgorithm.HS256)
@@ -52,4 +52,5 @@ public class JwtUtils {
 	public void  validateJwtToken(String token) throws Exception{
         	Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
+	
 }
