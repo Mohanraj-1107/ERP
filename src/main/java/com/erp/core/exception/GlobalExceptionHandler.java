@@ -50,8 +50,8 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(OrgNotFoundException.class)
 	public static  ResponseEntity<ErrorResponse> handleOrgNotFoundException(OrgNotFoundException e,HttpServletRequest request){
-		ErrorResponse response=new ErrorResponse(e.getMessage(),HttpStatus.BAD_REQUEST.value(),request.getRequestURI(),Instant.now());
+		ErrorResponse response=new ErrorResponse(e.getMessage(),HttpStatus.UNAUTHORIZED.value(),request.getRequestURI(),Instant.now());
 	    logger.warn("Invalid request body: {}", e.getMessage());
-	    return ResponseEntity.badRequest().body(response);
+	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
 	}
 }

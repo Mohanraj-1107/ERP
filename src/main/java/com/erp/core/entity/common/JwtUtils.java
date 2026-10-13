@@ -15,10 +15,10 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 public class JwtUtils {
-	@Value("${jwt.secret}")
+	@Value("${app.jwt.secret}")
 	private String jwtSecret;
 	
-	@Value("${jwt.expiration}")
+	@Value("${app.jwt.expiration}")
 	private int jwtExpirationMs;
 	
     private SecretKey key;
@@ -52,5 +52,4 @@ public class JwtUtils {
 	public void  validateJwtToken(String token) throws Exception{
         	Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
-	
 }
