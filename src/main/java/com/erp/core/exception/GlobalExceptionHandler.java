@@ -54,4 +54,25 @@ public class GlobalExceptionHandler {
 	    logger.warn("Invalid request body: {}", e.getMessage());
 	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
 	}
+
+	@ExceptionHandler(InvalidRefreshTokenException.class)
+	public static ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException e, HttpServletRequest request) {
+		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(), Instant.now());
+		logger.warn("Invalid refresh token: {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
+	}
+
+	@ExceptionHandler(RefreshTokenReuseException.class)
+	public static ResponseEntity<ErrorResponse> handleRefreshTokenReuseException(RefreshTokenReuseException e, HttpServletRequest request) {
+		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(), Instant.now());
+		logger.warn("Refresh token reuse detected: {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public static ResponseEntity<ErrorResponse> handleGenericException(Exception e, HttpServletRequest request) {
+		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), Instant.now());
+		logger.error("Unexpected error: {}", e.getMessage(), e);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(response);
+	}
 }

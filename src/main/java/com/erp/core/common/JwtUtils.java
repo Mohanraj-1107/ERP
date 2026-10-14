@@ -1,5 +1,5 @@
 //$Id$
-package com.erp.core.entity.common;
+package com.erp.core.common;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;

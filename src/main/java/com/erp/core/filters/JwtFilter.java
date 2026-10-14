@@ -8,7 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import com.erp.core.entity.common.ErrorResponse;
-import com.erp.core.entity.common.JwtUtils;
+import com.erp.core.common.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -33,15 +33,30 @@ public class JwtFilter implements Filter{
 	private static final String REFRESH_TOKEN="refresh_token";
 	
 	private final JwtUtils jwtUtil;
-	
+
 	private static final Set<String> publicUrls=Set.of(
-			//TODO Need to add public API's - Format : api:method ,ex - v1/login:post
+			// Public API's (full request URI, lowercased method)
 			"/erp/api/v1/login:post",
-			"/erp/api/v1/org:post"
+			"/erp/api/v1/org:post",
+			"/erp/api/v1/refresh:post",
+			"/erp/api/v1/logout:post"
 	);
 	
 	public JwtFilter(JwtUtils jwtUtil) {
 		this.jwtUtil=jwtUtil;
+	}
+
+	private String toJson(ErrorResponse errorResponse) {
+		return "{\"errorMessage\":\"" + escapeJson(errorResponse.errorMessage()) +
+				"\",\"errorCode\":" + errorResponse.errorCode() +
+				",\"path\":\"" + escapeJson(errorResponse.path()) +
+				"\",\"timestamp\":\"" + errorResponse.timestamp() + "\"}";
+	}
+
+	private String escapeJson(String value) {
+		if (value == null) return "";
+		return value.replace("\\", "\\\\").replace("\"", "\\\"")
+				.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
 	}
 	
 	@Override
@@ -63,7 +78,7 @@ public class JwtFilter implements Filter{
 			errorResponse=new ErrorResponse("Unauthorized access - Invalid access token",
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 		}
 		for(Cookie cookie:cookies) {
@@ -82,7 +97,7 @@ public class JwtFilter implements Filter{
 			errorResponse=new ErrorResponse("Unauthorized access - Access token is missing in request",
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse.toString());
+			out.print(toJson(errorResponse));
 			return;
 		}
 		try {
@@ -92,42 +107,42 @@ public class JwtFilter implements Filter{
 			errorResponse=new ErrorResponse("Unauthorized access - Invalid access token "+e.getMessage(),
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 	    }catch (MalformedJwtException e) {
 	    	PrintWriter out=setJsonResponseType(response);
 	    	errorResponse=new ErrorResponse("Unauthorized access - MalformedJwtException access token "+e.getMessage(),
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			); 
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 	    }catch(ExpiredJwtException e) {
 	    	PrintWriter out=setJsonResponseType(response);
 	    	errorResponse=new ErrorResponse("Unauthorized access - access token expired "+e.getMessage(),
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 	    }catch(UnsupportedJwtException e) {
 	    	PrintWriter out=setJsonResponseType(response);
 	    	errorResponse=new ErrorResponse("Unauthorized access - token format is unsupported "+e.getMessage(),
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 	    }catch (IllegalArgumentException e) {
 	    	PrintWriter out=setJsonResponseType(response);
 	    	errorResponse=new ErrorResponse("Unauthorized access - illegal argument exception "+e.getMessage(),
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 	    }catch(Exception e) {
 	    	PrintWriter out=setJsonResponseType(response);
 	    	errorResponse=new ErrorResponse("Unexpected error occurred while validating the access token "+e.getMessage(),
 					HttpStatus.UNAUTHORIZED.value(),requestUri,Instant.now()
 			);
-			out.print(errorResponse);
+			out.print(toJson(errorResponse));
 			return;
 	    }
 		chain.doFilter(httpRequest, response);
@@ -141,10 +156,12 @@ public class JwtFilter implements Filter{
 	    return false;
 	}
 	
-	public PrintWriter setJsonResponseType(ServletResponse response) throws IOException, ServletException{
-		PrintWriter out=response.getWriter();
+	public PrintWriter setJsonResponseType(ServletResponse response) throws IOException, ServletException {
+		if (response instanceof HttpServletResponse httpServletResponse) {
+			httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+		}
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		return out;
+		return response.getWriter();
 	}
 }

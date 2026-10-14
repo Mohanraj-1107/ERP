@@ -1,5 +1,5 @@
 //$Id$
-package com.erp.core.entity.common;
+package com.erp.core.common;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
