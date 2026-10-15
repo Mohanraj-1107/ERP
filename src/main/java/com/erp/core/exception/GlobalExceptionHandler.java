@@ -55,6 +55,20 @@ public class GlobalExceptionHandler {
 	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
 	}
 
+	@ExceptionHandler(IllegalArgumentException.class)
+	public static ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
+		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), Instant.now());
+		logger.warn("Invalid argument: {}", e.getMessage());
+		return ResponseEntity.badRequest().body(response);
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public static ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
+		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), request.getRequestURI(), Instant.now());
+		logger.warn("Entity not found: {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(response);
+	}
+
 	@ExceptionHandler(InvalidRefreshTokenException.class)
 	public static ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException e, HttpServletRequest request) {
 		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(), Instant.now());

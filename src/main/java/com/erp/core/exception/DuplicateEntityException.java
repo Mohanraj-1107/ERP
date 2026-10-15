@@ -1,7 +1,7 @@
 //$Id$
 package com.erp.core.exception;
 
-public class DuplicateEntityException extends Exception {
+public class DuplicateEntityException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 

@@ -1,6 +1,8 @@
 //$Id$
 package com.erp.core.entity.product;
 
+import lombok.Getter;
+import lombok.Setter;
 import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,6 +19,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @SuppressWarnings("unused")
+@Getter
+@Setter
 @Entity
 public class Product {
 	
@@ -56,4 +60,92 @@ public class Product {
 	@UpdateTimestamp
 	@Column(nullable=false)
 	private Instant modifiedOn;
+	
+	public long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(long productId) {
+		this.productId = productId;
+	}
+
+	public Organization getOrg() {
+		return org;
+	}
+
+	public void setOrg(Organization org) {
+		this.org = org;
+	}
+
+	public String getProductCode() {
+		return productCode;
+	}
+
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public double getPurchasePrice() {
+		return purchasePrice;
+	}
+
+	public void setPurchasePrice(double purchasePrice) {
+		this.purchasePrice = purchasePrice;
+	}
+
+	public double getSellingPrice() {
+		return sellingPrice;
+	}
+
+	public void setSellingPrice(double sellingPrice) {
+		this.sellingPrice = sellingPrice;
+	}
+
+	public double getTaxRate() {
+		return taxRate;
+	}
+
+	public void setTaxRate(double taxRate) {
+		this.taxRate = taxRate;
+	}
+
+	public double getMinimumStock() {
+		return minimumStock;
+	}
+
+	public void setMinimumStock(double minimumStock) {
+		this.minimumStock = minimumStock;
+	}
+
+	public Unit getUnit() {
+		return unit;
+	}
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Instant createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public Instant getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(Instant modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
 }
