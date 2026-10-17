@@ -40,7 +40,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | Product | ✅ Complete | CRUD, paginated list, org-scoped, unique code/name per org, price/tax validation |
 | **Inventory** | ✅ Complete | Entity, repo, service, controller; auto-create on product; add/remove stock; low-stock; paginated list; org-scoped |
 | **Customer** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
-| Supplier | ⬜ Not started | Placeholder entity only |
+| **Supplier** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
 | Purchase | ⬜ Not started | Empty placeholder |
 | Sale | ⬜ Not started | Empty placeholder |
 
@@ -73,7 +73,19 @@ This file tracks the project roadmap, current module status, next steps, and pro
 - Validation: duplicate email rejected per org
 
 ### Docs
-- `docs.md` updated with Customer and Inventory endpoint sections; known-gaps note adjusted
+- `docs.md` updated with Customer, Inventory, and Supplier endpoint sections; known-gaps note adjusted
+
+### Supplier module (completed)
+- `Supplier` entity: `@Getter`/`@Setter`, unique constraint `uk_supplier_org_email` on `(orgId, supplierEmail)`
+- `SupplierRepo`: find by org+supplierId, find all by org (paginated), exists-by-email, list by org
+- `SupplierService` + `SupplierController`: full CRUD
+  - `POST /v1/suppliers`
+  - `GET /v1/suppliers/{supplierId}`
+  - `GET /v1/suppliers` (paginated)
+  - `PATCH /v1/suppliers/{supplierId}`
+  - `DELETE /v1/suppliers/{supplierId}`
+- DTOs: `CreateSupplierRequest`, `UpdateSupplierRequest`, `SupplierResponse`, `AddressRequest`, `AddressResponse`
+- Validation: duplicate email rejected per org
 
 ## 5. Verification (completed)
 - `./mvnw compile` — BUILD SUCCESS
@@ -81,22 +93,11 @@ This file tracks the project roadmap, current module status, next steps, and pro
 - Manual smoke test against running app + MySQL:
   - Inventory: auto-create → add → remove → low-stock trigger → remove-over-available rejected (400) → qty ≤ 0 rejected (400) → cross-org access → 404 → no auth → 401
   - Customer: create → get → paginated list → partial update → duplicate email → 400 → delete → 204 → 404
+  - Supplier: create → get → paginated list → partial update → duplicate email → 400 → delete → 204 → 404
 
 ## 6. Next Implementation Plans (Priority Order)
 
-### Phase 1 — Supplier Module (Immediate Next)
-Mirror the Customer module for suppliers.
-- `Supplier` entity: org-scoped, unique constraints (e.g., supplier email per org)
-- `SupplierRepo`: org-scoped find/list/exists-by-email
-- `SupplierService` + `SupplierController`: full CRUD
-  - `POST /v1/suppliers`
-  - `GET /v1/suppliers/{supplierId}`
-  - `GET /v1/suppliers` (paginated)
-  - `PATCH /v1/suppliers/{supplierId}`
-  - `DELETE /v1/suppliers/{supplierId}`
-- Validation: duplicate email/phone rejected per org
-
-### Phase 2 — Purchase Workflow
+### Phase 1 — Purchase Workflow
 Link purchases to inventory stock increase.
 - `Purchase` / `PurchaseItem` entities: org-scoped, status (DRAFT, ORDERED, RECEIVED, CANCELLED)
 - Create purchase order; link items to products
@@ -121,7 +122,7 @@ Link sales to inventory stock decrease.
 
 Product → Inventory → Customer → Supplier → Purchase → Sale
 
-You are currently at: **Inventory and Customer complete; Supplier is next.**
+You are currently at: **Inventory, Customer, and Supplier complete; Purchase is next.**
 
 ## 8. How to Run
 

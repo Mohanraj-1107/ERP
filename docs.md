@@ -57,6 +57,18 @@ Customer rules:
 - Customers are org-scoped
 - `customerEmail` is unique per organization
 
+### Supplier management
+Endpoints:
+- `POST /erp/api/v1/suppliers` — create supplier
+- `GET /erp/api/v1/suppliers/{supplierId}` — get supplier
+- `GET /erp/api/v1/suppliers` — paginated list (`page`, `size`)
+- `PATCH /erp/api/v1/suppliers/{supplierId}` — partial update
+- `DELETE /erp/api/v1/suppliers/{supplierId}` — delete supplier
+
+Supplier rules:
+- Suppliers are org-scoped
+- `supplierEmail` is unique per organization
+
 ### Inventory management
 Endpoints:
 - `GET /erp/api/v1/inventory` — paginated list of inventory for the org (`page`, `size`)
@@ -130,7 +142,7 @@ Profiles:
 
 - Only Organization and Product have full controller/service/repository flows.
 - `Inventory` lacks complete entity/service/controller implementation.
-- `Customer` and `Supplier` lack repositories/services/controllers. (`Customer` module is complete; `Supplier` remains.)
+- `Supplier` lacks repositories/services/controllers. (`Supplier` module is complete; `Purchase` remains.)
 - `Purchase` and `Sale` are empty placeholders.
 - `Product` hard delete is currently used; soft delete may be better later.
 - `OrgService` still throws checked `InvalidPathVariableException` in some places.
