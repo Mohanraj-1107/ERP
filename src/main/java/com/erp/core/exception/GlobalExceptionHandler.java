@@ -2,6 +2,9 @@
 package com.erp.core.exception;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,9 +39,14 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public static ResponseEntity<ErrorResponse> handleRequestBodyNullException(MethodArgumentNotValidException e,HttpServletRequest request){
-	      ErrorResponse response=new ErrorResponse(e.getMessage(),HttpStatus.BAD_REQUEST.value(),request.getRequestURI(),Instant.now());
-	      logger.warn("Invalid request body: {}", e.getMessage());
-	      return ResponseEntity.badRequest().body(response);
+		List<String> errors = e.getBindingResult().getFieldErrors().stream()
+				.map(fieldError -> fieldError.getDefaultMessage())
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+		String message = errors.isEmpty() ? "Validation failed" : String.join(", ", errors);
+		ErrorResponse response=new ErrorResponse(message,HttpStatus.BAD_REQUEST.value(),request.getRequestURI(),Instant.now());
+		logger.warn("Invalid request body: {}", message);
+		return ResponseEntity.badRequest().body(response);
 	}
 	
 	@ExceptionHandler(DuplicateEntityException.class)

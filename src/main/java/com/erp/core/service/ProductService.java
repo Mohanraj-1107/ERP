@@ -3,6 +3,7 @@ package com.erp.core.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.erp.core.entity.inventory.Inventory;
 import com.erp.core.entity.organization.Organization;
 import com.erp.core.entity.product.CreateProductRequest;
 import com.erp.core.entity.product.Product;
@@ -11,6 +12,7 @@ import com.erp.core.entity.product.UpdateProductRequest;
 import com.erp.core.entity.product.Unit;
 import com.erp.core.exception.DuplicateEntityException;
 import com.erp.core.exception.EntityNotFoundException;
+import com.erp.core.repository.InventoryRepo;
 import com.erp.core.repository.OrganizationRepo;
 import com.erp.core.repository.ProductRepo;
 
@@ -19,10 +21,13 @@ public class ProductService {
 
 	private final ProductRepo productRepo;
 	private final OrganizationRepo organizationRepo;
+	private final InventoryRepo inventoryRepo;
 
-	public ProductService(ProductRepo productRepo, OrganizationRepo organizationRepo) {
+	public ProductService(ProductRepo productRepo, OrganizationRepo organizationRepo,
+			InventoryRepo inventoryRepo) {
 		this.productRepo = productRepo;
 		this.organizationRepo = organizationRepo;
+		this.inventoryRepo = inventoryRepo;
 	}
 
 	public ProductResponse createProduct(Long orgId, CreateProductRequest request) {
@@ -56,7 +61,16 @@ public class ProductService {
 		product.setUnit(request.getUnit() == null ? Unit.KG : request.getUnit());
 
 		Product saved = productRepo.save(product);
+		createInventory(saved);
 		return toResponse(saved);
+	}
+
+	private void createInventory(Product product) {
+		Inventory inventory = new Inventory();
+		inventory.setOrg(product.getOrg());
+		inventory.setProduct(product);
+		inventory.setQuantity(0);
+		inventoryRepo.save(inventory);
 	}
 
 	public ProductResponse getProduct(Long orgId, Long productId) {
@@ -114,6 +128,7 @@ public class ProductService {
 	public void deleteProduct(Long orgId, Long productId) {
 		Product product = productRepo.findByOrg_OrgIdAndProductId(orgId, productId)
 				.orElseThrow(() -> new EntityNotFoundException("Product not found"));
+		inventoryRepo.deleteByProduct(product);
 		productRepo.delete(product);
 	}
 

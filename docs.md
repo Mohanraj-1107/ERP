@@ -45,6 +45,32 @@ Auth details:
 - Refresh tokens rotate on every refresh and support reuse detection
 - `JwtFilter` sets `OrgContext` for protected routes and clears it in `finally`
 
+### Customer management
+Endpoints:
+- `POST /erp/api/v1/customers` — create customer
+- `GET /erp/api/v1/customers/{customerId}` — get customer
+- `GET /erp/api/v1/customers` — paginated list (`page`, `size`)
+- `PATCH /erp/api/v1/customers/{customerId}` — partial update
+- `DELETE /erp/api/v1/customers/{customerId}` — delete customer
+
+Customer rules:
+- Customers are org-scoped
+- `customerEmail` is unique per organization
+
+### Inventory management
+Endpoints:
+- `GET /erp/api/v1/inventory` — paginated list of inventory for the org (`page`, `size`)
+- `GET /erp/api/v1/inventory/{productId}` — get the inventory record for a product
+- `POST /erp/api/v1/inventory/{productId}/add` — add stock (body: `{ "quantity": n }`)
+- `POST /erp/api/v1/inventory/{productId}/remove` — remove stock (body: `{ "quantity": n }`)
+- `GET /erp/api/v1/inventory/low-stock` — list inventory at or below each product's minimum stock
+
+Inventory rules:
+- An inventory record is created automatically when a product is created
+- Stock adjustments require a positive quantity
+- Removing more stock than available is rejected
+- Inventory is org-scoped; `quantity` cannot drop below zero
+
 ### Organization management
 Endpoints:
 - `POST /erp/api/v1/org` — create organization
@@ -72,7 +98,7 @@ Product rules:
 - `Customer` — organization-scoped customer
 - `Supplier` — organization-scoped supplier
 - `Product` — organization-scoped product with unit and pricing
-- `Inventory` — intended stock model (still being completed)
+- `Inventory` — organization-scoped stock per product with low-stock support
 - `Purchase` / `Sale` — placeholder modules
 
 ## Security and Multitenancy
@@ -104,7 +130,7 @@ Profiles:
 
 - Only Organization and Product have full controller/service/repository flows.
 - `Inventory` lacks complete entity/service/controller implementation.
-- `Customer` and `Supplier` lack repositories/services/controllers.
+- `Customer` and `Supplier` lack repositories/services/controllers. (`Customer` module is complete; `Supplier` remains.)
 - `Purchase` and `Sale` are empty placeholders.
 - `Product` hard delete is currently used; soft delete may be better later.
 - `OrgService` still throws checked `InvalidPathVariableException` in some places.
