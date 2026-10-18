@@ -21,8 +21,8 @@ This file tracks the project roadmap, current module status, next steps, and pro
 |------------|-------|
 | Multi-tenancy | Every entity is org-scoped; users of Org A cannot see Org B's data |
 | Authentication & Session | JWT access + rotating refresh tokens; login/logout/logout-all |
-| Organization Management | Create org, get org details |
-| Product Management | CRUD, paginated list, org-scoped, unique productCode/productName per org, price/tax validation, unit of measure, minimum stock |
+| Organization Management | Create org, get org details; `createdOn`/`modifiedOn` timestamps |
+| Product Management | CRUD, paginated list, org-scoped, unique productCode/productName per org (composite constraints), price/tax validation, unit of measure, minimum stock |
 | Inventory Management | Auto-create inventory on product creation; add/remove stock with validation (no negative stock); get inventory by product; paginated list; low-stock report (quantity ≤ minimumStock) |
 | Customer Management | CRUD, paginated list, org-scoped, unique email per org, multiple addresses per customer |
 | Supplier Management | (Planned) CRUD mirroring Customer; org-scoped |
@@ -41,8 +41,8 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | **Inventory** | ✅ Complete | Entity, repo, service, controller; auto-create on product; add/remove stock; low-stock; paginated list; org-scoped |
 | **Customer** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
 | **Supplier** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
-| Purchase | ⬜ Not started | Empty placeholder |
-| Sale | ⬜ Not started | Empty placeholder |
+| Purchase | ⬜ Entities done | `Purchase`, `PurchaseItems`, `PurchaseStatus` entities complete; repo/service/controller pending |
+| Sale | ⬜ Entities done | `Sale`, `SalesItems`, `SalesStatus` entities complete; repo/service/controller pending |
 
 ## 4. Completed Work (this session)
 
@@ -87,6 +87,15 @@ This file tracks the project roadmap, current module status, next steps, and pro
 - DTOs: `CreateSupplierRequest`, `UpdateSupplierRequest`, `SupplierResponse`, `AddressRequest`, `AddressResponse`
 - Validation: duplicate email rejected per org
 
+### Entity fixes (completed)
+- Product: replaced global `unique=true` on `productCode`/`productName` with composite unique constraints `uk_product_org_code` (`orgId, productCode`) and `uk_product_org_name` (`orgId, productName`) — two orgs can share the same product code
+- Organization: added `modifiedOn` field with `@UpdateTimestamp` for consistency with other entities
+
+### Purchase & Sale entities (completed)
+- `Purchase` / `PurchaseItems` / `PurchaseStatus` — entities complete, compile-verified
+- `Sale` / `SalesItems` / `SalesStatus` — entities complete, compile-verified
+- Both parent entities: org-scoped, `@OneToMany` items with cascade/orphan-removal, `@ManyToOne` to Organization/Supplier/Customer, `purchasedDate` (`nullable=false`), `status` (default DRAFT), `createdOn`/`modifiedOn` timestamps
+
 ## 5. Verification (completed)
 - `./mvnw compile` — BUILD SUCCESS
 - `./mvnw test` — BUILD SUCCESS (context load test passes)
@@ -99,16 +108,22 @@ This file tracks the project roadmap, current module status, next steps, and pro
 
 ### Phase 1 — Purchase Workflow
 Link purchases to inventory stock increase.
-- `Purchase` / `PurchaseItem` entities: org-scoped, status (DRAFT, ORDERED, RECEIVED, CANCELLED)
-- Create purchase order; link items to products
-- On marking RECEIVED → call Inventory addStock for each item (increase quantity)
+- `Purchase` / `PurchaseItems` / `PurchaseStatus` entities: ✅ Complete (org-scoped, status DRAFT/COMPLETED/CANCELLED, items with cascade)
+- Repo/Service/Controller: ⬜ Pending
+  - `PurchaseRepo`: find by org+id, paginated list by org
+  - `PurchaseService`: create purchase, update status to COMPLETED (triggers Inventory addStock for each item)
+  - `PurchaseController`: `POST /v1/purchases`, `GET /v1/purchases/{id}`, `GET /v1/purchases`, `PATCH /v1/purchases/{id}`
+- On marking COMPLETED → call `InventoryService.addStock` for each item (increase quantity)
 - Prevent duplicate receipt of same purchase
 
-### Phase 3 — Sale Workflow
+### Phase 2 — Sale Workflow
 Link sales to inventory stock decrease.
-- `Sale` / `SaleItem` entities: org-scoped, status (DRAFT, CONFIRMED, CANCELLED)
-- Create sale; link items to products with quantities
-- On confirmation → call Inventory removeStock for each item (decrease quantity, validate no negative stock)
+- `Sale` / `SalesItems` / `SalesStatus` entities: ✅ Complete (org-scoped, status DRAFT/CONFIRMED/CANCELLED, items with cascade)
+- Repo/Service/Controller: ⬜ Pending
+  - `SaleRepo`: find by org+id, paginated list by org
+  - `SaleService`: create sale, confirm sale (triggers Inventory removeStock for each item, validate no negative stock)
+  - `SaleController`: `POST /v1/sales`, `GET /v1/sales/{id}`, `GET /v1/sales`, `PATCH /v1/sales/{id}`
+- On confirmation → call `InventoryService.removeStock` for each item (decrease quantity)
 - Prevent confirming a sale that would drive stock below zero
 
 ### Phase 4 — Cross-Cutting Improvements
@@ -122,7 +137,7 @@ Link sales to inventory stock decrease.
 
 Product → Inventory → Customer → Supplier → Purchase → Sale
 
-You are currently at: **Inventory, Customer, and Supplier complete; Purchase is next.**
+You are currently at: **Inventory, Customer, Supplier complete; Purchase & Sale entities done; Purchase repo/service/controller next.**
 
 ## 8. How to Run
 

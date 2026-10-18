@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import java.time.Instant;
 import java.util.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 public class Organization {
@@ -41,6 +42,10 @@ public class Organization {
 	@CreationTimestamp
 	@Column(updatable=false)
 	private Instant createdOn;
+	
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private Instant modifiedOn;
 	
 	public long getOrgId() {
 		return orgId;
@@ -96,5 +101,13 @@ public class Organization {
 
 	public void setCreatedOn(Instant createdOn) {
 		this.createdOn = createdOn;
+	}
+
+	public Instant getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(Instant modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 }

@@ -10,6 +10,8 @@ import com.erp.core.entity.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +24,11 @@ import jakarta.persistence.ManyToOne;
 @Getter
 @Setter
 @Entity
+@Table(name = "product",
+		uniqueConstraints = {
+			@UniqueConstraint(name = "uk_product_org_code", columnNames = {"orgId", "productCode"}),
+			@UniqueConstraint(name = "uk_product_org_name", columnNames = {"orgId", "productName"})
+		})
 public class Product {
 	
 	@Id
@@ -33,10 +40,10 @@ public class Product {
 	@JsonIgnore
 	private Organization org;
 	
-	@Column(nullable=false,unique=true)
+	@Column(nullable=false)
 	private String productCode;
 	
-	@Column(nullable=false,unique=true)
+	@Column(nullable=false)
 	private String productName;
 	
 	@Column(nullable=false)
