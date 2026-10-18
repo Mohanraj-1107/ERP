@@ -71,4 +71,100 @@ public class Purchase {
 	@UpdateTimestamp
 	@Column(nullable = false)
 	private Instant modifiedOn;
+
+	public long getPurchaseId() {
+		return purchaseId;
+	}
+
+	public void setPurchaseId(long purchaseId) {
+		this.purchaseId = purchaseId;
+	}
+
+	public Organization getOrg() {
+		return org;
+	}
+
+	public void setOrg(Organization org) {
+		this.org = org;
+	}
+
+	public String getPurchaseNumber() {
+		return purchaseNumber;
+	}
+
+	public void setPurchaseNumber(String purchaseNumber) {
+		this.purchaseNumber = purchaseNumber;
+	}
+
+	public Supplier getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(Supplier supplier) {
+		this.supplier = supplier;
+	}
+
+	public double getSubtotalAmount() {
+		return subtotalAmount;
+	}
+
+	public void setSubtotalAmount(double subtotalAmount) {
+		this.subtotalAmount = subtotalAmount;
+	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	public double getTotalTaxAmount() {
+		return totalTaxAmount;
+	}
+
+	public void setTotalTaxAmount(double totalTaxAmount) {
+		this.totalTaxAmount = totalTaxAmount;
+	}
+
+	public Instant getPurchasedDate() {
+		return purchasedDate;
+	}
+
+	public void setPurchasedDate(Instant purchasedDate) {
+		this.purchasedDate = purchasedDate;
+	}
+
+	public PurchaseStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PurchaseStatus status) {
+		this.status = status;
+	}
+
+	public List<PurchaseItems> getItems() {
+		return items;
+	}
+
+	public void setItems(List<PurchaseItems> items) {
+		this.items = items;
+	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Instant createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public Instant getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(Instant modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
 }

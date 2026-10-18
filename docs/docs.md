@@ -69,6 +69,23 @@ Supplier rules:
 - Suppliers are org-scoped
 - `supplierEmail` is unique per organization
 
+### Purchase management
+Endpoints:
+- `POST /erp/api/v1/purchases` — create purchase order (body: `{ "supplierId": n, "items": [...] }`)
+- `GET /erp/api/v1/purchases/{purchaseId}` — get purchase details
+- `GET /erp/api/v1/purchases` — paginated list (`page`, `size`)
+- `PATCH /erp/api/v1/purchases/{purchaseId}` — update draft purchase
+- `POST /erp/api/v1/purchases/{purchaseId}/complete` — mark DRAFT → COMPLETED, increase inventory stock
+- `POST /erp/api/v1/purchases/{purchaseId}/cancel` — cancel purchase (reverses inventory if COMPLETED)
+- `DELETE /erp/api/v1/purchases/{purchaseId}` — delete draft purchase
+
+Purchase rules:
+- Purchases are org-scoped
+- Only DRAFT purchases can be updated or deleted
+- Only DRAFT purchases can be completed (increases inventory per item)
+- COMPLETED purchases can be cancelled (reverses inventory per item)
+- CANCELLED purchases cannot be modified
+
 ### Inventory management
 Endpoints:
 - `GET /erp/api/v1/inventory` — paginated list of inventory for the org (`page`, `size`)

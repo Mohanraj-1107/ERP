@@ -41,7 +41,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | **Inventory** | ✅ Complete | Entity, repo, service, controller; auto-create on product; add/remove stock; low-stock; paginated list; org-scoped |
 | **Customer** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
 | **Supplier** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
-| Purchase | ⬜ Entities done | `Purchase`, `PurchaseItems`, `PurchaseStatus` entities complete; repo/service/controller pending |
+| Purchase | ✅ Complete | Entity, repo, service, controller; DRAFT/COMPLETED/CANCELLED lifecycle; inventory integration on complete/cancel |
 | Sale | ⬜ Entities done | `Sale`, `SalesItems`, `SalesStatus` entities complete; repo/service/controller pending |
 
 ## 4. Completed Work (this session)
@@ -73,7 +73,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 - Validation: duplicate email rejected per org
 
 ### Docs
-- `docs.md` updated with Customer, Inventory, and Supplier endpoint sections; known-gaps note adjusted
+- `docs/docs.md` updated with Customer, Inventory, and Supplier endpoint sections; known-gaps note adjusted
 
 ### Supplier module (completed)
 - `Supplier` entity: `@Getter`/`@Setter`, unique constraint `uk_supplier_org_email` on `(orgId, supplierEmail)`
@@ -103,18 +103,29 @@ This file tracks the project roadmap, current module status, next steps, and pro
   - Inventory: auto-create → add → remove → low-stock trigger → remove-over-available rejected (400) → qty ≤ 0 rejected (400) → cross-org access → 404 → no auth → 401
   - Customer: create → get → paginated list → partial update → duplicate email → 400 → delete → 204 → 404
   - Supplier: create → get → paginated list → partial update → duplicate email → 400 → delete → 204 → 404
+  - Purchase: create draft → complete (inventory +10) → cancel completed (inventory −10) → double cancel (400) → delete cancelled (400)
+
+## 6. Next Implementation Plans (Priority Order)
+
+### Purchase module (completed)
+- `Purchase` / `PurchaseItems` / `PurchaseStatus` entities: org-scoped, status lifecycle DRAFT → COMPLETED/CANCELLED
+- `PurchaseRepo`: find by org+id, paginated list by org, list by org
+- `PurchaseService` + `PurchaseController`: full lifecycle
+  - `POST /v1/purchases` — create DRAFT purchase with items (validates org, supplier, product ownership; quantity > 0)
+  - `GET /v1/purchases/{purchaseId}` — get purchase (org-scoped)
+  - `GET /v1/purchases` — paginated list (org-scoped)
+  - `PATCH /v1/purchases/{purchaseId}` — update DRAFT purchase (items, supplier, date; recalculates totals)
+  - `POST /v1/purchases/{purchaseId}/complete` — DRAFT → COMPLETED, increases inventory per item
+  - `POST /v1/purchases/{purchaseId}/cancel` — DRAFT → CANCELLED (no inventory impact); COMPLETED → CANCELLED (reverses inventory); CANCELLED → blocked
+  - `DELETE /v1/purchases/{purchaseId}` — delete DRAFT only
+- Auto-calculates line totals, subtotal, tax, total
+- DTOs: `CreatePurchaseRequest`, `PurchaseItemRequest`, `UpdatePurchaseRequest`, `PurchaseResponse`, `PurchaseItemResponse`
+- Validation: duplicate completion blocked, already-cancelled blocked, insufficient stock on reverse blocked
 
 ## 6. Next Implementation Plans (Priority Order)
 
 ### Phase 1 — Purchase Workflow
-Link purchases to inventory stock increase.
-- `Purchase` / `PurchaseItems` / `PurchaseStatus` entities: ✅ Complete (org-scoped, status DRAFT/COMPLETED/CANCELLED, items with cascade)
-- Repo/Service/Controller: ⬜ Pending
-  - `PurchaseRepo`: find by org+id, paginated list by org
-  - `PurchaseService`: create purchase, update status to COMPLETED (triggers Inventory addStock for each item)
-  - `PurchaseController`: `POST /v1/purchases`, `GET /v1/purchases/{id}`, `GET /v1/purchases`, `PATCH /v1/purchases/{id}`
-- On marking COMPLETED → call `InventoryService.addStock` for each item (increase quantity)
-- Prevent duplicate receipt of same purchase
+✅ Complete
 
 ### Phase 2 — Sale Workflow
 Link sales to inventory stock decrease.
@@ -137,7 +148,7 @@ Link sales to inventory stock decrease.
 
 Product → Inventory → Customer → Supplier → Purchase → Sale
 
-You are currently at: **Inventory, Customer, Supplier complete; Purchase & Sale entities done; Purchase repo/service/controller next.**
+You are currently at: **Inventory, Customer, Supplier, Purchase complete; Purchase & Sale entities done; Sale repo/service/controller next.**
 
 ## 8. How to Run
 

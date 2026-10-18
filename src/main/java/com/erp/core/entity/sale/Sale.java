@@ -71,4 +71,100 @@ public class Sale {
 	@UpdateTimestamp
 	@Column(nullable = false)
 	private Instant modifiedOn;
+
+	public long getSaleId() {
+		return saleId;
+	}
+
+	public void setSaleId(long saleId) {
+		this.saleId = saleId;
+	}
+
+	public Organization getOrg() {
+		return org;
+	}
+
+	public void setOrg(Organization org) {
+		this.org = org;
+	}
+
+	public String getSalesNumber() {
+		return salesNumber;
+	}
+
+	public void setSalesNumber(String salesNumber) {
+		this.salesNumber = salesNumber;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
+	public double getSubtotalAmount() {
+		return subtotalAmount;
+	}
+
+	public void setSubtotalAmount(double subtotalAmount) {
+		this.subtotalAmount = subtotalAmount;
+	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	public double getTotalTaxAmount() {
+		return totalTaxAmount;
+	}
+
+	public void setTotalTaxAmount(double totalTaxAmount) {
+		this.totalTaxAmount = totalTaxAmount;
+	}
+
+	public Instant getPurchasedDate() {
+		return purchasedDate;
+	}
+
+	public void setPurchasedDate(Instant purchasedDate) {
+		this.purchasedDate = purchasedDate;
+	}
+
+	public SalesStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(SalesStatus status) {
+		this.status = status;
+	}
+
+	public List<SalesItems> getItems() {
+		return items;
+	}
+
+	public void setItems(List<SalesItems> items) {
+		this.items = items;
+	}
+
+	public Instant getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Instant createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public Instant getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(Instant modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
 }

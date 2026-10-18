@@ -4,7 +4,7 @@ ERP Core is a Spring Boot backend for managing accounts and operations of small-
 
 The project is currently **under active construction**. Organization onboarding/authentication and the Product module are functional; inventory, customer, supplier, sales, and purchase workflows are being implemented.
 
-**Detailed technical documentation is available in [`docs.md`](docs.md).**
+**Detailed technical documentation is available in [`docs/docs.md`](docs/docs.md).**
 
 ## Overview
 
@@ -82,11 +82,11 @@ Important environment variables:
 - `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`
 - `COOKIE_SECURE`
 
-See [`docs.md`](docs.md) for the full configuration list and API details.
+See [`docs/docs.md`](docs/docs.md) for the full configuration list and API details.
 
 ## Documentation
 
-- [`docs.md`](docs.md) — architecture, API endpoints, domain model, security, configuration, known gaps, and next steps
+- [`docs/docs.md`](docs/docs.md) — architecture, API endpoints, domain model, security, configuration, known gaps, and next steps
 
 ## Repository
 
