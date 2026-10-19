@@ -1,11 +1,9 @@
 package com.erp.core.service;
 
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import com.erp.core.entity.inventory.Inventory;
 import com.erp.core.entity.inventory.InventoryResponse;
 import com.erp.core.entity.product.Product;

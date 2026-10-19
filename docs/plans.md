@@ -27,7 +27,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | Customer Management | CRUD, paginated list, org-scoped, unique email per org, multiple addresses per customer |
 | Supplier Management | (Planned) CRUD mirroring Customer; org-scoped |
 | Purchase Management | (Planned) Create purchase orders; on receipt, increase inventory stock |
-| Sale Management | (Planned) Create sales; on confirmation, decrease inventory stock with no-negative-stock validation |
+| Sale Management | ✅ Complete | Create sales; on confirmation, decrease inventory stock with no-negative-stock validation |
 
 **Out of scope (for now):** Multi-user roles within an org, financial accounting/ledger, barcode scanning, POS hardware integration, email/SMS notifications, mobile app.
 
@@ -42,7 +42,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | **Customer** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
 | **Supplier** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
 | Purchase | ✅ Complete | Entity, repo, service, controller; DRAFT/COMPLETED/CANCELLED lifecycle; inventory integration on complete/cancel |
-| Sale | ⬜ Entities done | `Sale`, `SalesItems`, `SalesStatus` entities complete; repo/service/controller pending |
+| Sale | ✅ Complete | Entity, repo, service, controller; DRAFT/COMPLETED/CANCELLED lifecycle; inventory integration on confirm/cancel |
 
 ## 4. Completed Work (this session)
 
@@ -96,6 +96,21 @@ This file tracks the project roadmap, current module status, next steps, and pro
 - `Sale` / `SalesItems` / `SalesStatus` — entities complete, compile-verified
 - Both parent entities: org-scoped, `@OneToMany` items with cascade/orphan-removal, `@ManyToOne` to Organization/Supplier/Customer, `purchasedDate` (`nullable=false`), `status` (default DRAFT), `createdOn`/`modifiedOn` timestamps
 
+### Sale module (completed)
+- `Sale` / `SalesItems` / `SalesStatus` entities: org-scoped, status lifecycle DRAFT → COMPLETED/CANCELLED
+- `SaleRepo`: find by org+id, paginated list by org, list by org
+- `SaleService` + `SaleController`: full lifecycle
+  - `POST /v1/sales` — create DRAFT sale with items (validates org, customer, product ownership; quantity > 0)
+  - `GET /v1/sales/{saleId}` — get sale (org-scoped)
+  - `GET /v1/sales` — paginated list (org-scoped)
+  - `PATCH /v1/sales/{saleId}` — update DRAFT sale (items, customer, date; recalculates totals)
+  - `POST /v1/sales/{saleId}/confirm` — DRAFT → COMPLETED, decreases inventory per item (validates sufficient stock)
+  - `POST /v1/sales/{saleId}/cancel` — DRAFT → CANCELLED (no inventory impact); COMPLETED → CANCELLED (reverses inventory); CANCELLED → blocked
+  - `DELETE /v1/sales/{saleId}` — delete DRAFT only
+- Auto-calculates line totals, subtotal, tax, total
+- DTOs: `CreateSaleRequest`, `SaleItemRequest`, `UpdateSaleRequest`, `SaleResponse`, `SaleItemResponse`
+- Validation: duplicate confirmation blocked, already-cancelled blocked, insufficient stock at confirm blocked
+
 ## 5. Verification (completed)
 - `./mvnw compile` — BUILD SUCCESS
 - `./mvnw test` — BUILD SUCCESS (context load test passes)
@@ -148,7 +163,7 @@ Link sales to inventory stock decrease.
 
 Product → Inventory → Customer → Supplier → Purchase → Sale
 
-You are currently at: **Inventory, Customer, Supplier, Purchase complete; Purchase & Sale entities done; Sale repo/service/controller next.**
+You are currently at: **All core modules complete — Auth, Organization, Product, Inventory, Customer, Supplier, Purchase, Sale.**
 
 ## 8. How to Run
 

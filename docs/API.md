@@ -272,26 +272,50 @@ All business endpoints (except auth) require a valid JWT access token set via th
 
 ---
 
-## 8. Sale (Not Yet Implemented)
+## 8. Sale
 
-Planned endpoints (entities exist, repo/service/controller pending):
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `POST` | `/v1/sales` | Create sale order (status: DRAFT) | Yes |
+| `GET` | `/v1/sales/{saleId}` | Get sale by ID | Yes |
+| `GET` | `/v1/sales` | Paginated list (`page`, `size`) | Yes |
+| `PATCH` | `/v1/sales/{saleId}` | Update draft sale | Yes |
+| `POST` | `/v1/sales/{saleId}/confirm` | DRAFT → COMPLETED, decrease inventory stock | Yes |
+| `POST` | `/v1/sales/{saleId}/cancel` | Cancel sale (reverses inventory if COMPLETED) | Yes |
+| `DELETE` | `/v1/sales/{saleId}` | Delete draft sale | Yes |
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/v1/sales` | Create sale order (status: DRAFT) |
-| `GET` | `/v1/sales/{saleId}` | Get sale by ID |
-| `GET` | `/v1/sales` | Paginated list (`page`, `size`) |
-| `PATCH` | `/v1/sales/{saleId}` | Update draft sale |
-| `POST` | `/v1/sales/{saleId}/confirm` | DRAFT → CONFIRMED, decrease inventory stock |
-| `POST` | `/v1/sales/{saleId}/cancel` | Cancel sale (reverses inventory if CONFIRMED) |
-| `DELETE` | `/v1/sales/{saleId}` | Delete draft sale |
+### Create Sale Request
+```json
+{
+  "customerId": 1,
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 5.0,
+      "unitPrice": 65.0,
+      "taxRate": 5.0,
+      "discountRate": 0.0
+    }
+  ]
+}
+```
 
-### Planned Sale Rules
+### Sale Status Lifecycle
+| From → To | Action | Inventory Impact |
+|-----------|--------|------------------|
+| `DRAFT` → `COMPLETED` | Confirm sale | ✅ Decreases stock per item |
+| `DRAFT` → `CANCELLED` | Cancel draft | ❌ No inventory change |
+| `COMPLETED` → `CANCELLED` | Cancel confirmed | ✅ Reverses stock per item |
+| `CANCELLED` → anything | Blocked | ❌ Not allowed |
+
+### Sale Rules
 - Sales are org-scoped
 - Only `DRAFT` sales can be updated or deleted
 - Only `DRAFT` sales can be confirmed (decreases inventory per item)
-- `CONFIRMED` sales can be cancelled (reverses inventory per item)
+- `COMPLETED` sales can be cancelled (reverses inventory per item)
+- `CANCELLED` sales cannot be modified
 - Cannot confirm a sale that would drive stock below zero
+- Auto-calculates line totals, subtotal, tax, and total amounts
 
 ---
 
@@ -331,7 +355,7 @@ All errors return a consistent JSON body:
 | Customer | ✅ Complete | create, get, list, update, delete |
 | Supplier | ✅ Complete | create, get, list, update, delete |
 | Purchase | ✅ Complete | create, get, list, update, complete, cancel, delete |
-| Sale | ⬜ Not implemented | Entities exist; repo/service/controller pending |
+| Sale | ✅ Complete | create, get, list, update, confirm, cancel, delete |
 
 ---
 
