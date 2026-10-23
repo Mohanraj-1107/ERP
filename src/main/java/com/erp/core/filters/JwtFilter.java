@@ -26,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Set;
 
 @Component
-@WebFilter("/api/v1")
+@WebFilter("/erp/api/v1/*")
 @Order(1)
 public class JwtFilter implements Filter{
 	
@@ -66,6 +66,12 @@ public class JwtFilter implements Filter{
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
 			String requestUri = httpRequest.getRequestURI();
 			String method = httpRequest.getMethod();
+
+			// Allow CORS preflight requests to pass through without JWT validation
+			if ("OPTIONS".equalsIgnoreCase(method)) {
+				chain.doFilter(request, response);
+				return;
+			}
 
 			if (isPublicRequest(requestUri, method)) {
 				chain.doFilter(request, response);
