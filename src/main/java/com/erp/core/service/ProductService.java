@@ -15,6 +15,7 @@ import com.erp.core.exception.EntityNotFoundException;
 import com.erp.core.repository.InventoryRepo;
 import com.erp.core.repository.OrganizationRepo;
 import com.erp.core.repository.ProductRepo;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
@@ -124,7 +125,8 @@ public class ProductService {
 		Product saved = productRepo.save(product);
 		return toResponse(saved);
 	}
-
+	
+	@Transactional
 	public void deleteProduct(Long orgId, Long productId) {
 		Product product = productRepo.findByOrg_OrgIdAndProductId(orgId, productId)
 				.orElseThrow(() -> new EntityNotFoundException("Product not found"));

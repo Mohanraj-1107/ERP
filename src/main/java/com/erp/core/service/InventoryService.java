@@ -88,6 +88,8 @@ public class InventoryService {
 		return new InventoryResponse(
 				inventory.getInventoryId(),
 				inventory.getProduct().getProductId(),
+				inventory.getProduct().getProductName(),
+				inventory.getProduct().getUnit().toString(),
 				inventory.getOrg().getOrgId(),
 				inventory.getQuantity(),
 				inventory.getCreatedOn(),
