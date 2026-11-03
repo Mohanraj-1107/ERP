@@ -90,6 +90,13 @@ public class GlobalExceptionHandler {
 		logger.warn("Refresh token reuse detected: {}", e.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
 	}
+	
+	@ExceptionHandler(LoginFailedException.class)
+	public static ResponseEntity<ErrorResponse> handleLoginFailedException(LoginFailedException e, HttpServletRequest request) {
+		ErrorResponse response = new ErrorResponse(e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(), Instant.now());
+		logger.warn("Login failed provided email or password is incorrect : {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
+	}
 
 	@ExceptionHandler(Exception.class)
 	public static ResponseEntity<ErrorResponse> handleGenericException(Exception e, HttpServletRequest request) {

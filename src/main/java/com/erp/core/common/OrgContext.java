@@ -1,5 +1,7 @@
 package com.erp.core.common;
 
+import com.erp.core.exception.InvalidRefreshTokenException;
+
 public final class OrgContext {
 
 	private static final ThreadLocal<Long> ORG_ID = new ThreadLocal<>();
@@ -17,5 +19,13 @@ public final class OrgContext {
 
 	public static void clear() {
 		ORG_ID.remove();
+	}
+	
+	public static long currentOrgId() {
+		Long orgId = OrgContext.getOrgId();
+		if (orgId == null) {
+			throw new InvalidRefreshTokenException("Access token is missing");
+		}
+		return orgId;
 	}
 }

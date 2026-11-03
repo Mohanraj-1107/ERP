@@ -3,11 +3,13 @@ package com.erp.core.service;
 
 import java.time.Instant;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.erp.core.entity.common.AuthResult;
+
 import com.erp.core.common.JwtUtils;
+import com.erp.core.entity.common.AuthResult;
 import com.erp.core.entity.organization.CreateOrgRequest;
 import com.erp.core.entity.organization.GetOrgResponse;
 import com.erp.core.entity.organization.LoginRequest;
@@ -15,6 +17,7 @@ import com.erp.core.entity.organization.LoginResponse;
 import com.erp.core.entity.organization.Organization;
 import com.erp.core.exception.DuplicateEntityException;
 import com.erp.core.exception.InvalidPathVariableException;
+import com.erp.core.exception.LoginFailedException;
 import com.erp.core.exception.OrgNotFoundException;
 import com.erp.core.exception.RequestBodyNullException;
 import com.erp.core.repository.OrganizationRepo;
@@ -86,7 +89,7 @@ public class OrgService {
 			response.setMessage("Login failed : Provided password is incorrect");
 			response.setOrgId(null);
 			response.setStatus("failed");
-			return new AuthResult(response, null, null);
+			throw new LoginFailedException("Entered password is incorrect");
 		}
 
 		String accessToken = jwtUtils.generateAccessToken(org.getOrgId() + "");
