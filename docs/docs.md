@@ -1,4 +1,4 @@
-# ERP Core — Internal Documentation
+# Actus — Internal Documentation
 
 This document contains implementation details for contributors. For a project overview, see [`README.md`](README.md).
 
@@ -100,6 +100,18 @@ Inventory rules:
 - Removing more stock than available is rejected
 - Inventory is org-scoped; `quantity` cannot drop below zero
 
+### Dashboard management
+Endpoints:
+- `GET /erp/api/v1/dashboard` — consolidated KPI summary (products, customers, suppliers, low/out-of-stock, completed sales revenue, completed purchase spend)
+- `GET /erp/api/v1/dashboard/sales` — sales counts & per-status amounts (DRAFT/COMPLETED/CANCELLED) + revenue & tax
+- `GET /erp/api/v1/dashboard/purchases` — purchase counts & per-status amounts + spend & tax
+- `GET /erp/api/v1/dashboard/inventory` — inventory health (low-stock & out-of-stock products)
+
+Dashboard rules:
+- All endpoints are org-scoped and require a valid JWT access token
+- Read-only aggregation over existing entities; no new tables
+- Amounts are summed only for COMPLETED records in the KPI totals; per-status `amount` is returned for every status in the sales/purchases breakdowns (frontend `ChartLegendItem` supports percentage & amount modes)
+
 ### Organization management
 Endpoints:
 - `POST /erp/api/v1/org` — create organization
@@ -138,6 +150,31 @@ Product rules:
 - Business queries should always be filtered by `orgId`.
 - Passwords are BCrypt-hashed.
 - JWT secret should be provided by environment in production.
+
+## Request Validation
+
+All create/update request bodies are validated with Jakarta Bean Validation (`jakarta.validation`) before any business logic or database operation runs. Constraint violations return `400 Bad Request` with an `ErrorResponse` body listing the violated field messages (handled by `GlobalExceptionHandler`).
+
+### Purchase and Sales item collections
+Both `CreatePurchaseRequest`/`UpdatePurchaseRequest` and `CreateSaleRequest`/`UpdateSaleRequest` constrain the `items` collection:
+- Minimum items: `1` (null or empty rejected on create).
+- Maximum items: `150` (151+ rejected).
+- Each nested item is validated (`@Valid`) — `productId` required, `quantity`/`unitPrice` > 0, `taxRate`/`discountRate` between 0 and 100.
+
+### Numeric limits
+- `quantity` / `unitPrice`: > 0 and capped at 1,000,000 / 10,000,000 respectively.
+- `taxRate` / `discountRate`: 0–100.
+- Product `purchasePrice`/`sellingPrice`: > 0, capped at 10,000,000.
+- Product `taxRate`: 0–100; `minimumStock`: ≥ 0.
+- Stock adjustment `quantity`: > 0, capped at 1,000,000.
+
+### String / collection limits
+- Organization: `orgName` 5–100, `orgPassword` 8–64, `mobileNo` pattern, address list 1+ with validated address fields.
+- Customer/Supplier: name 2–100, mobile 10–15 digits, GST 2–20, email format, address list 1–10.
+- Product: `productCode` 1–50, `productName` 1–100.
+- Login: `orgEmail` (email format), `password` 8–64.
+
+Partial-update (PATCH) DTOs keep fields optional — constraints apply only when a value is present, while collections (when provided) still enforce min/max size.
 
 ## Configuration
 

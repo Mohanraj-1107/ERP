@@ -1,10 +1,10 @@
-# ERP Core — Implementation Plan & Status
+# Actus — Implementation Plan & Status
 
 This file tracks the project roadmap, current module status, next steps, and product scope so context is preserved across sessions.
 
 ## 1. Project Overview
 
-**ERP Core** is a Spring Boot backend for small-scale businesses to manage accounts and operations.
+**Actus** is a Spring Boot backend for small-scale businesses to manage accounts and operations.
 
 - **Model:** Organization-centric / multi-tenant. Every business entity belongs to an `Organization`.
 - **Auth:** JWT access tokens (HttpOnly cookies) + opaque rotating refresh tokens (SHA-256 hashed in MySQL).
@@ -28,6 +28,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | Supplier Management | (Planned) CRUD mirroring Customer; org-scoped |
 | Purchase Management | (Planned) Create purchase orders; on receipt, increase inventory stock |
 | Sale Management | ✅ Complete | Create sales; on confirmation, decrease inventory stock with no-negative-stock validation |
+| Dashboard | ✅ Complete | Read-only org-scoped KPI/analytics: summary, sales, purchases, inventory health |
 
 **Out of scope (for now):** Multi-user roles within an org, financial accounting/ledger, barcode scanning, POS hardware integration, email/SMS notifications, mobile app.
 
@@ -43,6 +44,7 @@ This file tracks the project roadmap, current module status, next steps, and pro
 | **Supplier** | ✅ Complete | CRUD, paginated list, duplicate-email check per org, addresses |
 | Purchase | ✅ Complete | Entity, repo, service, controller; DRAFT/COMPLETED/CANCELLED lifecycle; inventory integration on complete/cancel |
 | Sale | ✅ Complete | Entity, repo, service, controller; DRAFT/COMPLETED/CANCELLED lifecycle; inventory integration on confirm/cancel |
+| Dashboard | ✅ Complete | Controller, service, DTOs; org-scoped KPI aggregation (summary, sales, purchases, inventory); no new tables |
 
 ## 4. Completed Work (this session)
 
@@ -120,6 +122,14 @@ This file tracks the project roadmap, current module status, next steps, and pro
   - Supplier: create → get → paginated list → partial update → duplicate email → 400 → delete → 204 → 404
   - Purchase: create draft → complete (inventory +10) → cancel completed (inventory −10) → double cancel (400) → delete cancelled (400)
 
+### Request validation (completed)
+- Bean Validation constraints added to all create/update request DTOs (Organization, Product, Customer, Supplier, Purchase, Sale, Inventory, Login).
+- Purchase/Sales item collections: min 1 / max 150 items, nested `@Valid` item validation (quantity/unitPrice > 0, tax/discount 0–100).
+- Numeric, string-length, email, and pattern constraints applied per field purpose.
+- `LoginController.login` now uses `@Valid @RequestBody`.
+- 82 unit tests covering min/max/collection/null/nested-item validation — all pass.
+- `./mvnw clean package` — BUILD SUCCESS (83 tests total).
+
 ## 6. Next Implementation Plans (Priority Order)
 
 ### Purchase module (completed)
@@ -163,7 +173,7 @@ Link sales to inventory stock decrease.
 
 Product → Inventory → Customer → Supplier → Purchase → Sale
 
-You are currently at: **All core modules complete — Auth, Organization, Product, Inventory, Customer, Supplier, Purchase, Sale.**
+You are currently at: **All core modules complete — Auth, Organization, Product, Inventory, Customer, Supplier, Purchase, Sale, Dashboard.**
 
 ## 8. How to Run
 

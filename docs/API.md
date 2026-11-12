@@ -1,4 +1,4 @@
-# ERP Core — API Reference
+# Actus — API Reference
 
 Base URL: `http://localhost:8080/erp/api`
 

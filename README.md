@@ -1,6 +1,6 @@
-# ERP Core
+# Actus
 
-ERP Core is a Spring Boot backend for managing accounts and operations of small-scale businesses. It is built around an **organization-centric** model, where organizations act as tenants/accounts and business modules (products, customers, suppliers, sales, purchases) are scoped to an organization.
+Actus is a Spring Boot backend for managing accounts and operations of small-scale businesses. It is built around an **organization-centric** model, where organizations act as tenants/accounts and business modules (products, customers, suppliers, sales, purchases) are scoped to an organization.
 
 The project is currently **under active construction**. Organization onboarding/authentication and the Product module are functional; inventory, customer, supplier, sales, and purchase workflows are being implemented.
 
@@ -8,7 +8,7 @@ The project is currently **under active construction**. Organization onboarding/
 
 ## Overview
 
-ERP Core provides:
+Actus provides:
 - Organization registration and login
 - JWT-based authentication with rotating opaque refresh tokens
 - Product management (org-scoped, paginated)
@@ -90,7 +90,7 @@ See [`docs/docs.md`](docs/docs.md) for the full configuration list and API detai
 
 ## Repository
 
-- GitHub: https://github.com/Mohanraj-1107/ERP
+- GitHub: https://github.com/Mohanraj-1107/Actus
 - Author: Mohanraj Subramani
 - Year: 2026
 - Status: Work in progress (`0.0.1-SNAPSHOT`)
